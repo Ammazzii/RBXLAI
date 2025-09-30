@@ -24,3 +24,181 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 1. Global Styles & "Cosmic Gradient" Theme */
+:root {
+    /* Dark Theme Palette */
+    --background-dark: #0D1117;
+    --panel-color: #161B22;
+    --text-light: #F0F6FC;
+    --text-secondary-light: #8B949E;
+    --border-dark: #30363D;
+    
+    /* Shared Accent Palette */
+    --accent-color: #2563EB;
+    --accent-glow: rgba(37, 99, 235, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+}
+
+html { scroll-behavior: smooth; }
+
+.section-header { text-align: center; margin-bottom: 50px; }
+.section-header h2 { font-size: 2.5rem; margin-bottom: 0.5rem;}
+.section-header p { max-width: 500px; margin-left: auto; margin-right: auto; color: var(--text-secondary-light);}
+
+
+/* 2. NEW: Animated Gradient Background */
+.animated-gradient-background {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -2;
+    background: linear-gradient(300deg, #0d1117, #1f224e, #0d1117, #2563eb);
+    background-size: 400% 400%;
+    animation: gradient-shift 25s ease infinite;
+    opacity: 0.15;
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 3. Header & Navigation */
+header {
+    padding: 20px 30px; position: sticky; top: 0; z-index: 50;
+    background-color: rgba(13, 17, 23, 0.7);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-dark);
+}
+nav { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+nav .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-light); text-decoration: none; }
+
+nav ul { list-style: none; display: flex; gap: 30px; }
+nav ul li a { color: var(--text-secondary-light); text-decoration: none; font-weight: 600; transition: color 0.2s; }
+nav ul li a:hover { color: var(--accent-color); }
+
+.cta-button { display: inline-block; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: 600; background-color: var(--accent-color); color: #fff; transition: all 0.2s ease; border:none; cursor: pointer; }
+.cta-button:hover { transform: translateY(-2px); box-shadow: 0 4px 20px var(--accent-glow); }
+.cta-button.secondary { background-color: transparent; border: 1px solid var(--border-dark); color: var(--text-light); }
+.cta-button.secondary:hover { background-color: var(--panel-color); border-color: var(--text-secondary-light); box-shadow: none; }
+
+
+/* 4. Hero Section */
+#hero { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+.hero-title { font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; max-width: 900px; }
+.hero-subtitle { font-size: 1.25rem; color: var(--text-secondary-light); margin-bottom: 2.5rem; max-width: 500px; }
+
+#typewriter { color: var(--accent-color); border-right: 4px solid var(--accent-color); animation: blink-cursor 0.7s step-end infinite; padding-right: 2px; }
+@keyframes blink-cursor { from, to { border-color: transparent } 50% { border-color: var(--accent-color) } }
+
+.signup-form-container { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 1rem; }
+.signup-form { display: flex; border: 1px solid var(--border-dark); border-radius: 12px; background-color: var(--background-dark); box-shadow: 0 1px 2px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.1), 0 0 0 1px #000, 0 0 60px 0 var(--accent-glow); }
+.signup-form input[type="email"] { flex-grow: 1; border: none; outline: none; background: transparent; padding: 14px 20px; font-size: 1rem; color: var(--text-light); border-radius: 12px 0 0 12px; }
+.signup-form .cta-button { border-radius: 0 10px 10px 0; padding: 14px 20px; }
+
+.divider { display: flex; align-items: center; text-align: center; color: var(--text-secondary-light); font-size: 0.8rem; font-weight: 500; }
+.divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-dark); }
+.divider span { padding: 0 10px; }
+
+.google-button { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 14px 20px; font-size: 1rem; font-weight: 600; color: var(--text-light); background-color: var(--panel-color); border: 1px solid var(--border-dark); border-radius: 12px; cursor: pointer; transition: background-color 0.2s ease; }
+.google-button:hover { background-color: #21262d; }
+.form-footer-text, .form-footer-text a { color: var(--text-secondary-light); }
+.form-footer-text a:hover { color: var(--accent-color); }
+
+
+/* 5. Social Proof Section Styles */
+#social-proof { padding: 80px 0; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%); mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%); }
+.proof-text { text-align: center; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; color: var(--text-secondary-light); margin: 0 0 30px 0; }
+.logo-cloud { display: flex; animation: scroll-seamless 25s linear infinite; }
+.logo-scroll { display: flex; align-items: center; gap: 60px; padding: 0 30px; flex-shrink: 0; min-width: 50%; }
+
+.brand-logo { display: flex; align-items: center; gap: 12px; color: var(--text-secondary-light); }
+.brand-logo svg { stroke: var(--text-secondary-light); }
+.brand-logo span { font-weight: 600; font-size: 1.1rem; white-space: nowrap; }
+
+@keyframes scroll-seamless { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* 6. Features Section Styles */
+#features { padding: 80px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+.feature-card { background-color: var(--panel-color); border: 1px solid var(--border-dark); border-radius: 12px; padding: 30px; box-shadow: 0 4px 10px -5px rgba(0,0,0,0.2); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); border-color: var(--text-secondary-light); }
+.feature-card h2 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; color: var(--text-light); }
+
+/* Code Demo Styles */
+.code-demo { font-family: 'Source Code Pro', monospace; font-size: 0.85rem; }
+.code-demo-split { display: flex; flex-direction: column; gap: 10px; font-family: 'Source Code Pro', monospace; font-size: 0.85rem; }
+.code-half { flex: 1; }
+.code-label { font-size: 0.7rem; font-weight: 600; color: var(--text-secondary-light); margin-bottom: 5px; display: block; text-align: center; }
+
+.prompt-panel { padding: 10px; border-radius: 8px; background-color: rgba(37, 99, 235, 0.1); color: var(--accent-color); margin-bottom: 10px; text-align: center; font-weight: 600; font-family: 'Inter', sans-serif;}
+.code-panel { background-color: var(--background-dark); padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border-dark); }
+.code-panel.small { padding: 10px; }
+.explanation-panel { background-color: transparent; border: 1px dashed var(--border-dark); border-radius: 8px; padding: 15px; margin-top: 10px; color: var(--text-secondary-light); font-family: 'Inter', sans-serif; }
+
+/* Syntax Highlighting (Adjusted for Dark Mode) */
+.syntax-keyword { color: #58A6FF; } /* Blue */
+.syntax-function { color: #D2A8FF; } /* Purple */
+.syntax-string { color: #7EE787; } /* Green */
+.syntax-comment { color: #8B949E; } /* Gray */
+.syntax-number { color: #F78166; } /* Orange */
+.syntax-highlight { background-color: rgba(37, 99, 235, 0.2); border-radius: 4px; display: block; }
+
+/* 7. Pricing Section Styles */
+#pricing { padding: 80px 20px; }
+.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1200px; margin: 0 auto; align-items: stretch; }
+.pricing-card { background-color: var(--panel-color); border: 1px solid var(--border-dark); border-radius: 12px; padding: 40px; text-align: center; box-shadow: 0 4px 10px -5px rgba(0,0,0,0.2); transition: transform 0.3s ease, box-shadow 0.3s ease; position: relative; display: flex; flex-direction: column; }
+.pricing-card.popular { border: 2px solid var(--accent-color); box-shadow: 0 0 30px var(--accent-glow); }
+.popular-badge { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); background-color: var(--accent-color); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 99px; }
+.pricing-card h3 { font-size: 1.5rem; color: var(--text-light); }
+.pricing-card .price { font-size: 3rem; font-weight: 700; margin: 10px 0; color: var(--text-light); }
+.pricing-card .price span { font-size: 1rem; color: var(--text-secondary-light); font-weight: 500;}
+.pricing-card .price-desc { font-size: 0.9rem; color: var(--text-secondary-light); margin-bottom: 30px; flex-grow: 1; }
+.pricing-features { list-style: '✓  '; text-align: left; padding-left: 20px; margin-bottom: 40px; color: var(--text-secondary-light); }
+.pricing-features li { margin-bottom: 10px; color: var(--text-light); }
+.pricing-card .cta-button { width: 100%; margin-top: auto; }
+
+/* 8. FAQ Section Styles */
+#faq { padding: 80px 20px; }
+.faq-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+.faq-item { background-color: var(--panel-color); border: 1px solid var(--border-dark); border-radius: 12px; transition: margin 0.3s ease; }
+.faq-item[open] { margin: 10px 0; }
+.faq-item summary { font-size: 1.1rem; font-weight: 600; padding: 20px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: var(--text-light); }
+.faq-item summary::after { content: '+'; font-size: 1.5rem; color: var(--accent-color); transition: transform 0.3s ease; }
+.faq-item[open] summary::after { content: '-'; }
+.faq-item p { padding: 0 20px 20px 20px; margin: 0; color: var(--text-secondary-light); line-height: 1.7; }
+
+/* 9. Final CTA Section */
+#cta { padding: 100px 20px; text-align: center; }
+#cta h2 { font-size: 2.5rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+/* 10. Footer */
+footer { padding: 40px 20px; text-align: center; font-size: 0.9rem; color: var(--text-secondary-light); }
+
+/* 11. Scroll Animations & Responsive */
+.animate { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+.animate.visible { opacity: 1; transform: translateY(0); }
+.animate:nth-child(1) { transition-delay: 0.1s; }
+.animate:nth-child(2) { transition-delay: 0.2s; }
+.animate:nth-child(3) { transition-delay: 0.3s; }
+.animate:nth-child(4) { transition-delay: 0.4s; }
+
+
+@media (max-width: 1200px) {
+    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    nav ul { display: none; }
+    .hero-title { font-size: 2.5rem; }
+    .pricing-grid { grid-template-columns: 1fr; }
+}
