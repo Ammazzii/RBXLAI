@@ -1,0 +1,163 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionTier {
+  FREE
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum ApiCallType {
+  CHAT_COMPLETION
+  CODE_GENERATION
+  CODE_VALIDATION
+  OTHER
+}
+
+model User {
+  id                String           @id @default(cuid())
+  email             String           @unique
+  emailVerified     Boolean          @default(false)
+  emailVerifyToken  String?
+  passwordHash      String
+  name              String
+  subscriptionTier  SubscriptionTier @default(FREE)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  lastLoginAt       DateTime?
+  isActive          Boolean          @default(true)
+
+  // Stripe integration fields
+  stripeCustomerId       String?
+  stripeSubscriptionId   String?
+  stripeSubscriptionStatus String?
+
+  // Relations
+  credits           Credit?
+  sessions          Session[]
+  usageLogs         UsageLog[]
+  transactions      Transaction[]
+  projects          Project[]
+  passwordResets    PasswordReset[]
+
+  @@map("users")
+}
+
+model Credit {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  promptsUsedToday  Int      @default(0)
+  lastResetDate     DateTime @default(now()) // Track when daily limit was last reset
+  totalPromptsUsed  Int      @default(0)
+  lastUpdated       DateTime @updatedAt
+
+  // Relations
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("credits")
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  sessionToken String  @unique
+  expiresAt   DateTime
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model UsageLog {
+  id              String      @id @default(cuid())
+  userId          String
+  apiCallType     ApiCallType
+  tokensUsed      Int?        // Keep for analytics but not used for billing
+  promptsUsed     Int         @default(1) // Always 1 prompt per request
+  requestDetails  Json?       // Store request metadata
+  responseTime    Int?        // Response time in ms
+  createdAt       DateTime    @default(now())
+
+  // Relations
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("usage_logs")
+}
+
+model Transaction {
+  id                String            @id @default(cuid())
+  userId            String
+  amount            Decimal           @db.Decimal(10, 2) // Dollar amount
+  subscriptionTier  SubscriptionTier  // Tier purchased
+  paymentMethod     String            // stripe, paypal, etc.
+  stripePaymentId   String?
+  status            TransactionStatus @default(PENDING)
+  receiptUrl        String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  // Relations
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  data        Json     // Store project tree and scripts
+  isShared    Boolean  @default(false)
+  shareToken  String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("projects")
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_resets")
+}
+
+model SystemConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+
+  @@map("system_config")
+}
