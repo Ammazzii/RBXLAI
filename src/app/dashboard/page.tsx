@@ -736,7 +736,7 @@ const generateProjectTreeString = (nodes: ProjectItem[], prefix = ''): string =>
 
 // --- MAIN COMPONENT ---
 export default function HomePage() {
-  const { user, token, login, logout, isLoading: authLoading, promptStats, updatePromptStats } = useAuth();
+  const { user, token, logout, isLoading: authLoading, promptStats, updatePromptStats } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showBillingModal, setShowBillingModal] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{ role: 'assistant', content: 'Welcome to RBXAI! How can I help you build your Roblox game today?' }]);

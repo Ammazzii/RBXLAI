@@ -1,6 +1,5 @@
 'use client'; 
 
-import type { Metadata } from "next";
 import { Inter, Source_Code_Pro } from "next/font/google"; 
 import "./globals.css";
 // THE ONLY CHANGE IS ON THIS LINE:

@@ -54,7 +54,7 @@ export default function HeroSignUpForm() {
 
       <p className="form-footer-text">
         {/* Link to dashboard telling it to open the modal in 'register' view */}
-        Don't have an account? <Link href="/dashboard?view=register">Register</Link>
+        Don&apos;t have an account? <Link href="/dashboard?view=register">Register</Link>
       </p>
     </>
   );

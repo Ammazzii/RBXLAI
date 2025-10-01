@@ -101,7 +101,7 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
               {isLoading ? 'Logging In...' : 'Log In'}
             </button>
             <p className="mt-4 text-center text-sm text-gray-400">
-              Don't have an account?{' '}
+             Don&apos;t have an account?{' '}
               <button type="button" onClick={() => setView('register')} className="font-semibold text-blue-400 hover:underline">
                 Sign Up
               </button>

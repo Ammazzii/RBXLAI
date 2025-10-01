@@ -70,67 +70,59 @@ export default function LandingPage() {
 
                 {/* FEATURES SECTION (Simplified JSX from previous steps) */}
                 <section id="features">
-                    <div className="feature-card animate">
-                        <h2>From a prompt to a script.</h2>
-                        <div className="code-demo">
-                            <div className="prompt-panel">"Make a part that kills a player on touch"</div>
-                            <pre className="code-panel">
-                                <code>
-                                    <span className="syntax-keyword">local</span> part = script.Parent<br/><br/>
-                                    part.Touched:<span className="syntax-function">Connect</span>(<span className="syntax-keyword">function</span>(hit)<br/>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;<span className="syntax-keyword">local</span> humanoid = hit.Parent:<span className="syntax-function">FindFirstChild</span>(<span className="syntax-string">"Humanoid"</span>)<br/>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;<span className="syntax-keyword">if</span> humanoid <span className="syntax-keyword">then</span><br/>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;humanoid.Health = <span className="syntax-number">0</span><br/>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;<span className="syntax-keyword">end</span><br/>
-                                    <span className="syntax-keyword">end</span>)
-                                </code>
-                            </pre>
-                        </div>
-                    </div>
-                    <div className="feature-card animate">
-                        <h2>Your personal coding tutor.</h2>
-                        <div className="code-demo">
-                            <pre className="code-panel">
-                                <code>
-                                    <span className="syntax-comment">-- What does this line do?</span><br/>
-                                    <span className="syntax-highlight">part.Touched:<span className="syntax-function">Connect</span>(<span className="syntax-keyword">function</span>(hit)</span><br/>
-                                    ...<br/>
-                                    <span className="syntax-keyword">end</span>)
-                                </code>
-                            </pre>
-                            <div className="explanation-panel">
-                                This line connects a function to the 'Touched' event. The function will run every time another part physically touches `part` in the game.
-                            </div>
-                        </div>
-                    </div>
-                    <div className="feature-card animate">
-                        <h2>Debug and Optimize.</h2>
-                        <div className="code-demo-split">
-                            <div className="code-half">
-                                <span className="code-label">BEFORE</span>
-                                <pre className="code-panel small">
-                                    <code>
-                                        <span className="syntax-keyword">function</span> <span className="syntax-function">onTouched</span>(hit)<br/>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;<span className="syntax-keyword">if</span> hit.Parent...<br/>
-                                        <span className="syntax-keyword">end</span><br/>
-                                        part.Touched:connect(onTouched)
-                                    </code>
-                                </pre>
-                            </div>
-                            <div className="code-half">
-                                <span className="code-label">AFTER</span>
-                                <pre className="code-panel small">
-                                    <code>
-                                        <span className="syntax-comment">-- Modern event handling</span><br/>
-                                        part.Touched:<span className="syntax-function">Connect</span>(<span className="syntax-keyword">function</span>(hit)<br/>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;...<br/>
-                                        <span className="syntax-keyword">end</span>)
-                                    </code>
-                                </pre>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+    <div className="feature-card animate">
+        <h2>From a prompt to a script.</h2>
+        <div className="code-demo">
+            <div className="prompt-panel">{`"Make a part that kills a player on touch"`}</div>
+            <pre className="code-panel"><code>
+                <span className="syntax-keyword">local</span> part = script.Parent<br/><br/>
+                part.Touched:<span className="syntax-function">Connect</span>(<span className="syntax-keyword">function</span>(hit)<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span className="syntax-keyword">local</span> humanoid = hit.Parent:<span className="syntax-function">FindFirstChild</span>(<span className="syntax-string">&quot;Humanoid&quot;</span>)<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span className="syntax-keyword">if</span> humanoid <span className="syntax-keyword">then</span><br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;humanoid.Health = <span className="syntax-number">0</span><br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span className="syntax-keyword">end</span><br/>
+                <span className="syntax-keyword">end</span>)
+            </code></pre>
+        </div>
+    </div>
+    <div className="feature-card animate">
+        <h2>Your personal coding tutor.</h2>
+        <div className="code-demo">
+            <pre className="code-panel"><code>
+                <span className="syntax-comment">-- What does this line do?</span><br/>
+                <span className="syntax-highlight">part.Touched:<span className="syntax-function">Connect</span>(<span className="syntax-keyword">function</span>(hit)</span><br/>
+                ...<br/>
+                <span className="syntax-keyword">end</span>)
+            </code></pre>
+            <div className="explanation-panel">
+                {`This line connects a function to the 'Touched' event. The function will run every time another part physically touches 'part' in the game.`}
+            </div>
+        </div>
+    </div>
+    <div className="feature-card animate">
+        <h2>Debug and Optimize.</h2>
+        <div className="code-demo-split">
+            <div className="code-half">
+                <span className="code-label">BEFORE</span>
+                <pre className="code-panel small"><code>
+                    <span className="syntax-keyword">function</span> <span className="syntax-function">onTouched</span>(hit)<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span className="syntax-keyword">if</span> hit.Parent...<br/>
+                    <span className="syntax-keyword">end</span><br/>
+                    part.Touched:connect(onTouched)
+                </code></pre>
+            </div>
+            <div className="code-half">
+                <span className="code-label">AFTER</span>
+                <pre className="code-panel small"><code>
+                    <span className="syntax-comment">-- Modern event handling</span><br/>
+                    part.Touched:<span className="syntax-function">Connect</span>(<span className="syntax-keyword">function</span>(hit)<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;...<br/>
+                    <span className="syntax-keyword">end</span>)
+                </code></pre>
+            </div>
+        </div>
+    </div>
+</section>
 
                 {/* PRICING SECTION */}
                 <section id="pricing" className="animate">
