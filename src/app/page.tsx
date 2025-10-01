@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import LandingPageClient from './LandingPageClient'; 
-import HeroSignUpForm from './components/HeroSignUpForm'; 
 
 export default function LandingPage() {
     return (
@@ -19,14 +18,18 @@ export default function LandingPage() {
             </header>
             <main>
                 <section id="hero">
-                    <h1 className="hero-title animate">
-                        Build Roblox games 10x faster with your AI assistant for <span id="typewriter"></span>
-                    </h1>
-                    <p className="hero-subtitle animate">Generate, debug, and understand complex Luau scripts using simple English.</p>
-                    <div className="signup-form-container animate">
-                         <HeroSignUpForm />
-                    </div>
-                </section>
+    <h1 className="hero-title animate">
+        Build Roblox games 10x faster with your AI assistant for <span id="typewriter"></span>
+    </h1>
+    <p className="hero-subtitle animate">Generate, debug, and understand complex Luau scripts using simple English.</p>
+    
+    {/* --- THE NEW, SIMPLE CTA BUTTON --- */}
+   <div className="mt-8 animate">
+    <Link href="/dashboard" className="cta-button large primary px-8 py-4 text-lg">
+        Get Started For Free
+    </Link>
+</div>
+</section>
                 <section id="social-proof" className="animate">
                     <p className="proof-text">TRUSTED BY THE NEXT GENERATION OF ROBLOX CREATORS</p>
                     <div className="logo-cloud">
@@ -188,10 +191,12 @@ export default function LandingPage() {
                         </details>
                     </div>
                 </section>
-                <section id="cta" className="animate">
-                    <h2>Ready to Start Building?</h2>
-                    <Link href="/dashboard" className="cta-button large">Get Started For Free</Link>
-                </section>
+               <section id="cta" className="animate">
+    <h2>Ready to Start Building?</h2>
+    <Link href="/dashboard" className="cta-button large px-8 py-4 text-lg">
+        Get Started For Free
+    </Link>
+</section>
             </main>
             <footer>
                 <p>&copy; 2025 RBXLabs. All Rights Reserved.</p>

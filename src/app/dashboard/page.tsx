@@ -13,6 +13,7 @@ import { ValidationError } from '@/utils/luaValidator';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import BillingModal from '@/components/BillingModal';
+import { useRouter } from 'next/navigation';
 
 // --- ROBLOX-STYLE ICONS ---
 const ArrowIcon = ({ isOpen }: { isOpen: boolean }) => (
@@ -736,7 +737,11 @@ const generateProjectTreeString = (nodes: ProjectItem[], prefix = ''): string =>
 
 // --- MAIN COMPONENT ---
 export default function HomePage() {
-  const { user, token, login, logout, isLoading: authLoading, promptStats, updatePromptStats } = useAuth();
+  const { user, token, logout, isLoading: authLoading, promptStats, updatePromptStats } = useAuth();
+  
+  // --- NEW CODE, PART 1: INITIALIZE THE ROUTER ---
+  const router = useRouter(); 
+
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showBillingModal, setShowBillingModal] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{ role: 'assistant', content: 'Welcome to RBXAI! How can I help you build your Roblox game today?' }]);
@@ -749,6 +754,12 @@ export default function HomePage() {
   const [modifiedFiles, setModifiedFiles] = useState<Map<string, ModifiedFile>>(new Map());
   const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+
+  // --- NEW CODE, PART 2: DEFINE THE REDIRECT FUNCTION ---
+  const handleModalCloseAndRedirect = () => {
+    setShowAuthModal(false);
+    router.push('/'); 
+  };
 
    // --- ADD THIS NEW BLOCK HERE ---
   useEffect(() => {
@@ -1400,9 +1411,9 @@ ${conversationalReply}`;
       {/* The Modals are now controlled by the gatekeeper logic */}
     <Suspense fallback={null}>
         <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-        />
+  isOpen={showAuthModal}
+  onClose={handleModalCloseAndRedirect}
+/>
       </Suspense>
 
       <BillingModal
