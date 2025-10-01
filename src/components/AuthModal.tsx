@@ -1,190 +1,141 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { z } from 'zod'
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useAuth } from '../contexts/AuthContext';
 
-interface User {
-  id: string
-  email: string
-  name: string
-  emailVerified: boolean
-  subscriptionTier: string
-  credits?: {
-    promptsUsedToday: number
-    totalPromptsUsed: number
-  }
-}
+export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { login } = useAuth();
+  const searchParams = useSearchParams();
 
-interface AuthModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: (user: User, token: string) => void
-}
+  const [view, setView] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-})
+  useEffect(() => {
+    if (isOpen) {
+      const emailFromUrl = searchParams.get('email');
+      if (emailFromUrl) setEmail(emailFromUrl);
 
-const registerSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-})
-
-export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
-  const [mode, setMode] = useState<'login' | 'register'>('login')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    name: ''
-  })
-
-  if (!isOpen) return null
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    try {
-      // Validate form data
-      const schema = mode === 'login' ? loginSchema : registerSchema
-      const validatedData = schema.parse(formData)
-
-      const response = await fetch(`/api/auth/${mode}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validatedData)
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Authentication failed')
-      }
-
-      // Store token in localStorage
-      localStorage.setItem('rbxai-token', data.token)
-
-      // Call success callback
-      onSuccess(data.user, data.token)
-      onClose()
-
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        setError(err.issues[0].message)
+      const viewFromUrl = searchParams.get('view');
+      if (viewFromUrl === 'register') {
+        setView('register');
       } else {
-        setError(err instanceof Error ? err.message : 'Authentication failed')
+        setView('login');
       }
-    } finally {
-      setLoading(false)
+      setError(null); // Clear errors when modal opens
     }
-  }
+  }, [isOpen, searchParams]);
 
-  const resetForm = () => {
-    setFormData({ email: '', password: '', name: '' })
-    setError('')
-  }
+  if (!isOpen) return null;
 
-  const switchMode = () => {
-    setMode(mode === 'login' ? 'register' : 'login')
-    resetForm()
-  }
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password }),
+    });
+
+    const data = await response.json();
+    setIsLoading(false);
+
+    if (response.ok) {
+      login(data.user, data.token);
+      onClose();
+    } else {
+      // THIS IS THE FIX: Show specific error messages from your API
+      if (data.details && data.details[0]) {
+        setError(data.details[0].message); // e.g., "Password must be at least 8 characters"
+      } else {
+        setError(data.error || 'Registration failed. Please try again.');
+      }
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+    setIsLoading(false);
+
+    if (response.ok) {
+      login(data.user, data.token);
+      onClose();
+    } else {
+      setError(data.error || 'Invalid email or password.');
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 w-96 max-w-[90vw]">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">
-            {mode === 'login' ? 'Login to RBXAI' : 'Create RBXAI Account'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'register' && (
-            <div>
-              <label className="block text-sm font-medium mb-2">Full Name</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-                placeholder="Enter your name"
-                required
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-gray-800 p-8 rounded-lg text-white w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+        
+        {view === 'login' ? (
+          <form onSubmit={handleLogin}>
+            <h2 className="text-2xl font-bold mb-4 text-center">Welcome Back</h2>
+            <p className="text-center text-gray-400 mb-6">Log in to continue to RBXAI.</p>
             <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-              placeholder="Enter your email"
-              required
+              type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Password</label>
             <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-              placeholder="Enter your password"
-              required
+              type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required
             />
-          </div>
-
-          {error && (
-            <div className="text-red-400 text-sm bg-red-900/20 border border-red-500/50 rounded p-2">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 px-4 py-2 rounded text-white transition-colors"
-          >
-            {loading ? 'Please wait...' : (mode === 'login' ? 'Login' : 'Create Account')}
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <span className="text-gray-400 text-sm">
-            {mode === 'login' ? "Don't have an account? " : "Already have an account? "}
-          </span>
-          <button
-            onClick={switchMode}
-            className="text-blue-400 hover:text-blue-300 text-sm font-medium"
-          >
-            {mode === 'login' ? 'Sign up' : 'Login'}
-          </button>
-        </div>
-
-        {mode === 'register' && (
-          <div className="mt-4 text-xs text-gray-400 text-center">
-            By creating an account, you start with 10 free prompts daily.
-            <br />
-            Upgrade anytime for more prompts and features.
-          </div>
+            <button type="submit" disabled={isLoading} className="w-full p-3 bg-blue-600 rounded hover:bg-blue-700 transition-colors disabled:bg-gray-500">
+              {isLoading ? 'Logging In...' : 'Log In'}
+            </button>
+            <p className="mt-4 text-center text-sm text-gray-400">
+              Don't have an account?{' '}
+              <button type="button" onClick={() => setView('register')} className="font-semibold text-blue-400 hover:underline">
+                Sign Up
+              </button>
+            </p>
+          </form>
+        ) : (
+          <form onSubmit={handleRegister}>
+            <h2 className="text-2xl font-bold mb-4 text-center">Create Your Account</h2>
+            <p className="text-center text-gray-400 mb-6">Join thousands of Roblox developers.</p>
+            <input
+              type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)}
+              className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required
+            />
+            <input
+              type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required
+            />
+            <input
+              type="password" placeholder="Password (min. 8 characters)" value={password} onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required
+            />
+            <button type="submit" disabled={isLoading} className="w-full p-3 bg-blue-600 rounded hover:bg-blue-700 transition-colors disabled:bg-gray-500">
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </button>
+            <p className="mt-4 text-center text-sm text-gray-400">
+              Already have an account?{' '}
+              <button type="button" onClick={() => setView('login')} className="font-semibold text-blue-400 hover:underline">
+                Log In
+              </button>
+            </p>
+          </form>
         )}
+        {error && <p className="mt-4 text-red-400 text-center bg-red-900/50 p-3 rounded">{error}</p>}
       </div>
     </div>
-  )
+  );
 }

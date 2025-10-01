@@ -19,11 +19,20 @@
   }
 }
 
+/* CONFLICTING BODY STYLE - Commented out to ensure Landing Page styles win */
+/*
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+*/
+
+/*
+ * --------------------------------------------
+ * START RBXAI LANDING PAGE STYLES (from style.css)
+ * --------------------------------------------
+ */
 
 /* 1. Global Styles & "Cosmic Gradient" Theme */
 :root {
@@ -48,24 +57,36 @@ body {
     line-height: 1.6;
     overflow-x: hidden;
     position: relative;
+    /* FIX #1: Ensure the body takes up the full height to fill the screen */
+    min-height: 100vh;
 }
 
-html { scroll-behavior: smooth; }
+html { 
+    scroll-behavior: smooth; 
+    /* FIX #2: Ensure the root HTML element itself is colored dark */
+    background-color: var(--background-dark);
+}
 
 .section-header { text-align: center; margin-bottom: 50px; }
 .section-header h2 { font-size: 2.5rem; margin-bottom: 0.5rem;}
 .section-header p { max-width: 500px; margin-left: auto; margin-right: auto; color: var(--text-secondary-light);}
 
 
-/* 2. NEW: Animated Gradient Background */
+/* 2. NEW: Animated Gradient Background (Around Line 70) */
 .animated-gradient-background {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     z-index: -2;
-    background: linear-gradient(300deg, #0d1117, #1f224e, #0d1117, #2563eb);
+    /* RETAIN the original opacity: 0.15 */
+    
+    /* NEW SUBTLE COLORS: Only use very dark shades */
+    /* Start with base color (#0D1117) and mix with a very dark blue (#11152a) */
+    background: linear-gradient(300deg, #0D1117, #11152a, #0D1117, #11152a);
+    
     background-size: 400% 400%;
     animation: gradient-shift 25s ease infinite;
-    opacity: 0.15;
+    opacity: 0.15; /* Restoring the original opacity to make the effect present */
 }
+
 
 @keyframes gradient-shift {
     0% { background-position: 0% 50%; }
@@ -202,3 +223,9 @@ footer { padding: 40px 20px; text-align: center; font-size: 0.9rem; color: var(-
     .hero-title { font-size: 2.5rem; }
     .pricing-grid { grid-template-columns: 1fr; }
 }
+
+/*
+ * --------------------------------------------
+ * END RBXAI LANDING PAGE STYLES
+ * --------------------------------------------
+ */

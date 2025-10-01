@@ -750,6 +750,19 @@ export default function HomePage() {
   const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
 
+   // --- ADD THIS NEW BLOCK HERE ---
+  useEffect(() => {
+    // If auth is done loading and there is NO user, we must show the modal.
+    if (!authLoading && !user) {
+      setShowAuthModal(true);
+    }
+    // If the user logs in, the user object will update, and this will hide the modal.
+    if (user) {
+      setShowAuthModal(false);
+    }
+  }, [user, authLoading]);
+  // --- END OF NEW BLOCK ---
+
   useEffect(() => { if (activeTabId === 'chat') { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); } }, [messages, isLoading, activeTabId]);
 
   // Auto-save functionality
@@ -1377,178 +1390,139 @@ ${conversationalReply}`;
       }
     }
   };
+  
+  // ---------------- //
+// --- START OF NEW CODE TO PASTE --- //
+// ---------------- //
 
   return (
-    <main className="flex h-screen flex-col text-white">
-      <header className="flex h-14 w-full flex-shrink-0 items-center justify-between border-b border-gray-700 bg-gray-800 px-4">
-        <h1 className="text-xl font-bold">RBXAI</h1>
+    <>
+      {/* The Modals are now controlled by the gatekeeper logic */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
 
-        <div className="flex items-center space-x-6">
-          {/* User Authentication & Prompt Stats */}
-          {authLoading ? (
-            <div className="text-sm text-gray-400">Loading...</div>
-          ) : user ? (
-            <div className="flex items-center space-x-4">
-              {/* Prompt Usage */}
-              <div className="flex items-center space-x-2">
-                <div className="text-xs text-gray-300">
-                  <span className="font-medium">{promptStats?.remainingPrompts || 0}</span>
-                  <span className="text-gray-400">/{promptStats?.dailyLimit || 10} prompts</span>
-                </div>
-                <div className={`text-xs px-2 py-1 rounded ${
-                  user.subscriptionTier === 'FREE' ? 'bg-gray-600 text-gray-200' :
-                  user.subscriptionTier === 'STARTER' ? 'bg-blue-600 text-white' :
-                  user.subscriptionTier === 'PROFESSIONAL' ? 'bg-purple-600 text-white' :
-                  'bg-gold-600 text-white'
-                }`}>
-                  {user.subscriptionTier}
-                </div>
-                {user.subscriptionTier === 'FREE' ? (
-                  <button
-                    onClick={() => setShowBillingModal(true)}
-                    className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-500 rounded text-white transition-colors"
-                    title="Upgrade for more prompts"
-                  >
-                    Upgrade
-                  </button>
-                ) : (
-                  <button
-                    onClick={async () => {
-                      try {
-                        const response = await fetch('/api/billing/manage-subscription', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                          },
-                          body: JSON.stringify({ action: 'create_portal_session' })
-                        })
-                        const data = await response.json()
-                        if (response.ok) {
-                          window.open(data.url, '_blank')
+      <BillingModal
+        isOpen={showBillingModal}
+        onClose={() => setShowBillingModal(false)}
+      />
+
+      {/* --- THE GATE --- */}
+      {/* If auth is still loading OR if there is no user, show a simple loading screen. */}
+      {authLoading || !user ? (
+        <div className="flex h-screen w-full items-center justify-center bg-gray-900">
+          <p className="animate-pulse text-gray-400">Authenticating...</p>
+        </div>
+      ) : (
+        // --- If the user IS logged in, render your FULL original UI ---
+        <main className="flex h-screen flex-col text-white">
+          <header className="flex h-14 w-full flex-shrink-0 items-center justify-between border-b border-gray-700 bg-gray-800 px-4">
+            <h1 className="text-xl font-bold">RBXAI</h1>
+            <div className="flex items-center space-x-6">
+              {user && (
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="text-xs text-gray-300">
+                      <span className="font-medium">{promptStats?.remainingPrompts || 0}</span>
+                      <span className="text-gray-400">/{promptStats?.dailyLimit || 10} prompts</span>
+                    </div>
+                    <div className={`text-xs px-2 py-1 rounded ${
+                      user.subscriptionTier === 'FREE' ? 'bg-gray-600 text-gray-200' :
+                      user.subscriptionTier === 'STARTER' ? 'bg-blue-600 text-white' :
+                      user.subscriptionTier === 'PROFESSIONAL' ? 'bg-purple-600 text-white' :
+                      'bg-gold-600 text-white'
+                    }`}>
+                      {user.subscriptionTier}
+                    </div>
+                    {user.subscriptionTier === 'FREE' ? (
+                      <button onClick={() => setShowBillingModal(true)} className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-500 rounded text-white transition-colors" title="Upgrade for more prompts">Upgrade</button>
+                    ) : (
+                      <button onClick={async () => {
+                        try {
+                          const response = await fetch('/api/billing/manage-subscription', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ action: 'create_portal_session' })
+                          })
+                          const data = await response.json()
+                          if (response.ok) {
+                            window.open(data.url, '_blank')
+                          }
+                        } catch (error) {
+                          console.error('Failed to open billing portal:', error)
                         }
-                      } catch (error) {
-                        console.error('Failed to open billing portal:', error)
-                      }
-                    }}
-                    className="text-xs px-2 py-1 bg-purple-600 hover:bg-purple-500 rounded text-white transition-colors"
-                    title="Manage subscription"
-                  >
-                    Manage
+                      }} className="text-xs px-2 py-1 bg-purple-600 hover:bg-purple-500 rounded text-white transition-colors" title="Manage subscription">Manage</button>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-300">Hi, {user.name}</span>
+                    <button onClick={logout} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs transition-colors" title="Logout">Logout</button>
+                  </div>
+                </div>
+              )}
+              {user && (
+                <div className="flex items-center space-x-2">
+                  <button onClick={() => setAutoSaveEnabled(!autoSaveEnabled)} className={`flex items-center space-x-1 px-2 py-1 rounded text-xs transition-colors ${autoSaveEnabled ? 'bg-green-600 hover:bg-green-500' : 'bg-gray-600 hover:bg-gray-500'}`} title={autoSaveEnabled ? 'Auto-save enabled' : 'Auto-save disabled'}>
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    <span>{autoSaveEnabled ? 'Auto-save' : 'Manual'}</span>
                   </button>
-                )}
-              </div>
-
-              {/* User Menu */}
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-300">Hi, {user.name}</span>
-                <button
-                  onClick={logout}
-                  className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs transition-colors"
-                  title="Logout"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded text-sm transition-colors"
-            >
-              Login / Sign Up
-            </button>
-          )}
-
-          {/* Auto-save Status (only show for authenticated users) */}
-          {user && (
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setAutoSaveEnabled(!autoSaveEnabled)}
-                className={`flex items-center space-x-1 px-2 py-1 rounded text-xs transition-colors ${
-                  autoSaveEnabled ? 'bg-green-600 hover:bg-green-500' : 'bg-gray-600 hover:bg-gray-500'
-                }`}
-                title={autoSaveEnabled ? 'Auto-save enabled' : 'Auto-save disabled'}
-              >
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-                <span>{autoSaveEnabled ? 'Auto-save' : 'Manual'}</span>
-              </button>
-
-              {lastAutoSave && (
-                <span className="text-xs text-gray-400">
-                  Last saved: {lastAutoSave.toLocaleTimeString()}
-                </span>
+                  {lastAutoSave && (<span className="text-xs text-gray-400">Last saved: {lastAutoSave.toLocaleTimeString()}</span>)}
+                </div>
               )}
             </div>
-          )}
-        </div>
-      </header>
-      <div className="flex flex-grow overflow-hidden">
-          <aside className="w-64 flex-shrink-0 border-r border-gray-700 bg-gray-800 flex flex-col">
-            {/* Explorer Header - Sticky */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-800 flex-shrink-0">
-              <h2 className="font-semibold text-lg">Explorer</h2>
-              <div className="flex items-center space-x-2">
-                <BackupRestoreMenu onBackup={handleBackupProject} onRestore={handleRestoreProject} />
-                <ImportMenu onImport={handleImport} />
-                <ScriptCreationMenu onCreateScript={recursivelyAddNode} />
+          </header>
+          <div className="flex flex-grow overflow-hidden">
+            <aside className="w-64 flex-shrink-0 border-r border-gray-700 bg-gray-800 flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-800 flex-shrink-0">
+                <h2 className="font-semibold text-lg">Explorer</h2>
+                <div className="flex items-center space-x-2">
+                  <BackupRestoreMenu onBackup={handleBackupProject} onRestore={handleRestoreProject} />
+                  <ImportMenu onImport={handleImport} />
+                  <ScriptCreationMenu onCreateScript={recursivelyAddNode} />
+                </div>
               </div>
-            </div>
-
-            {/* Scrollable Project Tree */}
-            <div className="flex-1 overflow-y-auto p-2">
-              {projectTree.map(node => <ProjectNode key={node.id} node={node} level={0} onFileSelect={handleFileSelect} activeFileId={activeTabId} onDelete={recursivelyDeleteNode} onExport={exportScript} />)}
-            </div>
-          </aside>
-          <section className="flex flex-grow flex-col bg-gray-900/50">
-            <div className="flex h-10 flex-shrink-0 border-b border-gray-900">
-              <button onClick={() => handleTabSelect('chat')} className={`flex items-center px-4 text-sm font-medium border-r border-gray-900 ${activeTabId === 'chat' ? 'bg-gray-700 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700/50'}`}>Chat</button>
-              {openTabs.map(tab => (<button key={tab.id} onClick={() => handleTabSelect(tab.id)} className={`flex items-center px-4 text-sm font-medium border-r border-gray-900 ${activeTabId === tab.id ? 'bg-gray-700 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700/50'}`}><span>{tab.name}</span><span onClick={(e) => handleCloseTab(tab.id, e)} className="ml-3 text-gray-500 hover:text-white">×</span></button>))}
-            </div>
-            <div className="flex-grow overflow-hidden">
-              {activeTabId === 'chat' && (<div className="flex flex-col h-full"><div className="flex-grow space-y-4 overflow-y-auto p-4">{messages.map((msg, index) => (
-                  <div key={`${msg.role}-${index}`} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-xl rounded-lg px-4 py-2 ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-800'}`}><ReactMarkdown remarkPlugins={[remarkGfm]} components={{ code(props) { const { children, className } = props; const match = /language-(\w+)/.exec(className || ''); return match ? (<HighlightedCodeBlock code={String(children).trim()} />) : (<code className="rounded bg-black/30 px-1 py-0.5">{children}</code>); } }}>{msg.content}</ReactMarkdown>
+              <div className="flex-1 overflow-y-auto p-2">
+                {projectTree.map(node => <ProjectNode key={node.id} node={node} level={0} onFileSelect={handleFileSelect} activeFileId={activeTabId} onDelete={recursivelyDeleteNode} onExport={exportScript} />)}
+              </div>
+            </aside>
+            <section className="flex flex-grow flex-col bg-gray-900/50">
+              <div className="flex h-10 flex-shrink-0 border-b border-gray-900">
+                <button onClick={() => handleTabSelect('chat')} className={`flex items-center px-4 text-sm font-medium border-r border-gray-900 ${activeTabId === 'chat' ? 'bg-gray-700 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700/50'}`}>Chat</button>
+                {openTabs.map(tab => (<button key={tab.id} onClick={() => handleTabSelect(tab.id)} className={`flex items-center px-4 text-sm font-medium border-r border-gray-900 ${activeTabId === tab.id ? 'bg-gray-700 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700/50'}`}><span>{tab.name}</span><span onClick={(e) => handleCloseTab(tab.id, e)} className="ml-3 text-gray-500 hover:text-white">×</span></button>))}
+              </div>
+              <div className="flex-grow overflow-hidden">
+                {activeTabId === 'chat' && (
+                  <div className="flex flex-col h-full">
+                    <div className="flex-grow space-y-4 overflow-y-auto p-4">{messages.map((msg, index) => (
+                      <div key={`${msg.role}-${index}`} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-xl rounded-lg px-4 py-2 ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-800'}`}>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ code(props) { const { children, className } = props; const match = /language-(\w+)/.exec(className || ''); return match ? (<HighlightedCodeBlock code={String(children).trim()} />) : (<code className="rounded bg-black/30 px-1 py-0.5">{children}</code>); } }}>{msg.content}</ReactMarkdown>
+                        </div>
                       </div>
+                    ))}{isLoading && (<div className="flex justify-start"><div className="max-w-xl rounded-lg bg-gray-800 px-4 py-2"><p className="animate-pulse">Assistant is typing...</p></div></div>)}<div ref={messagesEndRef} /></div>
+                    <div className="border-t border-gray-600 p-4">
+                      <input type="text" placeholder="Ask RBXAI for help..." className="w-full rounded bg-gray-800 p-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" value={inputValue} disabled={isLoading} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }} />
+                    </div>
                   </div>
-              ))}{isLoading && (<div className="flex justify-start"><div className="max-w-xl rounded-lg bg-gray-800 px-4 py-2"><p className="animate-pulse">Assistant is typing...</p></div></div>)}<div ref={messagesEndRef} /></div>
-              <div className="border-t border-gray-600 p-4">
-                  <input type="text" placeholder="Ask RBXAI for help..." className="w-full rounded bg-gray-800 p-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" value={inputValue} disabled={isLoading} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }} />
+                )}
+                {(() => {
+                  const activeFile = openTabs.find(tab => tab.id === activeTabId);
+                  if (!activeFile) return null;
+                  const editorKey = `${activeFile.path}_${activeFile.updateId || activeFile.id}`;
+                  return (<LuaEditor key={editorKey} file={activeFile} onCodeChange={recursivelyUpdateNode} />);
+                })()}
               </div>
-              </div>)}
-              {(() => {
-                const activeFile = openTabs.find(tab => tab.id === activeTabId);
-                if (!activeFile) return null;
-
-                // Use a key to force re-render when file content changes
-                const editorKey = `${activeFile.path}_${activeFile.updateId || activeFile.id}`;
-
-                return (
-                  <LuaEditor
-                    key={editorKey}
-                    file={activeFile}
-                    onCodeChange={recursivelyUpdateNode}
-                  />
-                );
-              })()}
-            </div>
-          </section>
-        </div>
-
-        {/* Authentication Modal */}
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          onSuccess={login}
-        />
-
-        {/* Billing Modal */}
-        <BillingModal
-          isOpen={showBillingModal}
-          onClose={() => setShowBillingModal(false)}
-        />
-    </main>
+            </section>
+          </div>
+        </main>
+      )}
+    </>
   );
 }
+// ---------------- //
+// --- END OF NEW CODE TO PASTE --- //
+// ---------------- //

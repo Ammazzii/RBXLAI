@@ -1,1 +1,33 @@
+# Dependencies
 /node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js build output
+/.next/
+/out/
+
+# Production
+/build
+
+# Vercel
+.vercel
+
+# Static
+/public/static
+
+# ESLint
+.eslintcache
+
+# dotenv environment variables file
+.env
+.env*.local
+
+# macOS
+.DS_Store
+
+# Misc
+*.pem
