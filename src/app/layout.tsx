@@ -2,7 +2,6 @@
 
 import { Inter, Source_Code_Pro } from "next/font/google"; 
 import "./globals.css";
-// THE ONLY CHANGE IS ON THIS LINE:
 import { AuthProvider } from '../contexts/AuthContext'; 
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });

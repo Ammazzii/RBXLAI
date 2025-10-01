@@ -26,7 +26,7 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
       } else {
         setView('login');
       }
-      setError(null); // Clear errors when modal opens
+      setError(null);
     }
   }, [isOpen, searchParams]);
 
@@ -50,9 +50,8 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
       login(data.user, data.token);
       onClose();
     } else {
-      // THIS IS THE FIX: Show specific error messages from your API
       if (data.details && data.details[0]) {
-        setError(data.details[0].message); // e.g., "Password must be at least 8 characters"
+        setError(data.details[0].message);
       } else {
         setError(data.error || 'Registration failed. Please try again.');
       }
@@ -101,7 +100,8 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
               {isLoading ? 'Logging In...' : 'Log In'}
             </button>
             <p className="mt-4 text-center text-sm text-gray-400">
-             Don&apos;t have an account?{' '}
+              {/* THIS IS THE FIX */}
+              Don&apos;t have an account?{' '}
               <button type="button" onClick={() => setView('register')} className="font-semibold text-blue-400 hover:underline">
                 Sign Up
               </button>
