@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Editor from 'react-simple-code-editor';
@@ -1398,10 +1398,12 @@ ${conversationalReply}`;
   return (
     <>
       {/* The Modals are now controlled by the gatekeeper logic */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
+    <Suspense fallback={null}>
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+        />
+      </Suspense>
 
       <BillingModal
         isOpen={showBillingModal}
