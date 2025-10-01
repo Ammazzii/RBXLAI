@@ -1,5 +1,6 @@
 'use client'; 
 
+import SessionGatekeeper from './components/SessionGatekeeper';
 import { Inter, Source_Code_Pro } from "next/font/google"; 
 import "./globals.css";
 import { AuthProvider } from '../contexts/AuthContext'; 
@@ -17,12 +18,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.className} ${sourceCodePro.className}`}> 
-      <body>
-        <AuthProvider>
+  <html lang="en" className={`${inter.className} ${sourceCodePro.className}`}> 
+    <body>
+      <AuthProvider>
+        {/* Wrap the children with the new Gatekeeper */}
+        <SessionGatekeeper>
           {children}
-        </AuthProvider>
-      </body>
-    </html>
-  );
+        </SessionGatekeeper>
+      </AuthProvider>
+    </body>
+  </html>
+);
 }
