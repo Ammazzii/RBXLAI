@@ -171,35 +171,41 @@ export default function EmailAuthForm() {
     );
 
     const renderPasswordLogin = () => (
-        <form onSubmit={handleLogin} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-6">
-            <h3 className="text-2xl font-bold text-white mb-2">Welcome Back</h3>
-            <p className="text-gray-400 text-center">Enter your password for <span className="font-semibold text-white">{email}</span></p>
+         <form onSubmit={handleRegister} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-8">
+            <h3 className="text-2xl font-bold text-white mb-2">Create Your Account</h3>
+            <p className="text-gray-400 text-center">Complete your registration for <span className="font-semibold text-white">{email}</span></p>
 
             {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+
+            {/* Name Input Field - USES NEW CSS CLASS */}
+            <input
+                type="text"
+                placeholder="Full Name (Optional)"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="auth-input-field" /* Custom CSS for tall input */
+            />
             
             {/* Password Input Field - USES NEW CSS CLASS */}
             <input
                 type="password"
-                placeholder="Password"
+                placeholder="Choose a Password (min 8 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="auth-input-field" /* Custom CSS for tall input */
                 required
             />
 
-            {/* Login Button - USES NEW CSS CLASS */}
+            {/* Register Button - USES NEW CSS CLASS */}
             <button
                 type="submit"
                 disabled={isLoading}
-                className="auth-primary-button mt-4" /* Custom CSS for tall button */
+                className="auth-primary-button" /* Custom CSS for tall button */
             >
-                {isLoading ? 'Logging In...' : 'Log In'}
+                {isLoading ? 'Registering...' : 'Create Account'}
             </button>
             
-            <Link href="#" className="text-sm text-blue-400 hover:underline">Forgot password?</Link>
-            <button type="button" onClick={() => { setView('email_input'); setPassword(''); }} className="text-sm text-gray-500 hover:text-gray-400 underline">Change Email</button>
-
-            <CommonSSOAndFooter isLoginView={true} />
+            <CommonSSOAndFooter isLoginView={false} />
 
         </form>
     );
