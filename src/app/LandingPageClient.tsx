@@ -8,16 +8,16 @@ import EmailAuthForm from '@/components/EmailAuthForm';
 // The words used in the original typewriter script
 const words = ["scripts.", "datastore systems.", "admin panels.", "UI animations."];
 
-// Helper type for elements we know will have children (since they represent the JSX structure)
-type ElementWithChildren = React.ReactElement<{ children: React.ReactNode; [key: string]: any }>;
-
 interface LandingPageClientProps {
     children: React.ReactNode;
 }
 
-// Type guard for safe element access (Fixes the heroChild.props errors)
-const isChildElement = (child: React.ReactNode): child is ElementWithChildren => {
-    return React.isValidElement(child);
+// Custom type for element props we expect to check
+type ElementProps = { id?: string; className?: string; children?: React.ReactNode; [key: string]: any };
+
+// Type guard that ensures the element is valid and has props
+const isElementWithProps = (child: React.ReactNode): child is React.ReactElement<ElementProps> => {
+    return React.isValidElement(child) && typeof child.props === 'object' && child.props !== null;
 };
 
 /**
@@ -30,13 +30,10 @@ export default function LandingPageClient({ children }: LandingPageClientProps) 
     const [displayText, setDisplayText] = useState('');
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Controls whether the form or the button is shown
     const [showAuthForm, setShowAuthForm] = useState(false);
-    
-    // Get URL parameters
     const searchParams = useSearchParams();
 
-    // --- Typewriter Effect Logic ---
+    // --- Typewriter Effect Logic (omitted for space) ---
     useEffect(() => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
@@ -71,7 +68,7 @@ export default function LandingPageClient({ children }: LandingPageClientProps) 
         };
     }, [charIndex, isDeleting, wordIndex]);
 
-    // --- Scroll Animation Logic ---
+    // --- Scroll Animation Logic (omitted for space) ---
     useEffect(() => {
         const animatedElements = document.querySelectorAll(".animate");
         
@@ -110,20 +107,20 @@ export default function LandingPageClient({ children }: LandingPageClientProps) 
     const renderContent = () => {
         return React.Children.map(children, (child) => {
             // Level 1: Find the <main> tag
-            if (isChildElement(child) && child.type === 'main') {
+            if (isElementWithProps(child) && child.type === 'main') {
                 const mainChild = child;
                 
                 return React.cloneElement(mainChild, {
                     children: React.Children.map(mainChild.props.children, (heroChild) => {
-                        if (!isChildElement(heroChild)) return heroChild;
+                        if (!isElementWithProps(heroChild)) return heroChild;
 
                         // Level 2: Find the Hero section
-                        if (heroChild.props?.id === 'hero') {
+                        if (heroChild.props.id === 'hero') {
                             const heroElement = heroChild;
 
                             return React.cloneElement(heroElement, {
                                 children: React.Children.map(heroElement.props.children, (ctaContainer) => {
-                                    if (!isChildElement(ctaContainer)) return ctaContainer;
+                                    if (!isElementWithProps(ctaContainer)) return ctaContainer;
                                     
                                     // Level 3: Find the CTA container (div with class mt-8 animate)
                                     if (ctaContainer.props.className?.includes('mt-8 animate')) {
