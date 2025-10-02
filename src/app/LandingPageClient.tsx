@@ -13,7 +13,7 @@ interface LandingPageClientProps {
 }
 
 // Custom type for element props we expect to check
-type ElementProps = { id?: string; className?: string; children?: React.ReactNode; [key: string]: any };
+type ElementProps = { id?: string; className?: string; children?: React.ReactNode; [key: string]: unknown };
 
 // Type guard that ensures the element is valid and has props
 const isElementWithProps = (child: React.ReactNode): child is React.ReactElement<ElementProps> => {

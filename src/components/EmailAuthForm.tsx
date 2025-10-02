@@ -78,7 +78,7 @@ export default function EmailAuthForm() {
             } else {
                 setError(data.error || 'Invalid password.');
             }
-        } catch (err) {
+        } catch (error) {
             setError('A network error occurred during login.');
             setIsLoading(false);
         }
@@ -104,7 +104,7 @@ export default function EmailAuthForm() {
             } else {
                 setError(data.error || 'Registration failed.');
             }
-        } catch (err) {
+        } catch (error) {
             setError('A network error occurred during registration.');
             setIsLoading(false);
         }
