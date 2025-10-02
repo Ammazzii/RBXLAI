@@ -129,7 +129,7 @@ export default function LandingPage() {
                                     <li>No Studio Plugin access</li>
                                     <li>Community support</li>
                                 </ul>
-                                <Link href="/dashboard" className="cta-button secondary">Start for Free</Link>
+                                <Link href="/?auth=true&plan=free" className="cta-button secondary">Start for Free</Link>
                             </div>
                             <div className="pricing-card animate">
                                 <h3>Starter</h3>
@@ -141,7 +141,7 @@ export default function LandingPage() {
                                     <li>Studio Plugin (Read-only)</li>
                                     <li>Up to 3 Projects</li>
                                 </ul>
-                                <Link href="/dashboard" className="cta-button secondary">Get Started</Link>
+                                <Link href="/?auth=true&plan=starter" className="cta-button secondary">Get Started</Link>
                             </div>
                             <div className="pricing-card popular animate">
                                 <div className="popular-badge">Most Popular</div>
@@ -155,7 +155,7 @@ export default function LandingPage() {
                                     <li>Code Collaboration</li>
                                     <li>Priority Support</li>
                                 </ul>
-                                <Link href="/dashboard" className="cta-button primary">Go Pro</Link>
+                               <Link href="/?auth=true&plan=pro" className="cta-button primary">Go Pro</Link>
                             </div>
                             <div className="pricing-card animate">
                                 <h3>Studio</h3>
@@ -168,7 +168,7 @@ export default function LandingPage() {
                                     <li>Custom AI Behaviors</li>
                                     <li>Advanced Analytics</li>
                                 </ul>
-                                <Link href="/dashboard" className="cta-button secondary">Contact Sales</Link>
+                                <Link href="/?auth=true&plan=studio" className="cta-button secondary">Contact Sales</Link>
                             </div>
                         </div>
                     </section>

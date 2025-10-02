@@ -1,14 +1,15 @@
-// src/components/EmailAuthForm.tsx
+// src/components/EmailAuthForm.tsx (Final Version with Plan Redirection)
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation'; // ADDED useSearchParams
 
 export default function EmailAuthForm() {
     const { login } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams(); // Initialized here
 
     const [view, setView] = useState<'email_input' | 'password_login' | 'password_register'>('email_input');
     const [email, setEmail] = useState('');
@@ -16,6 +17,19 @@ export default function EmailAuthForm() {
     const [name, setName] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Helper function for redirection logic
+    const redirectAfterAuth = () => {
+        const plan = searchParams.get('plan');
+        if (plan && plan !== 'free') {
+            // Redirect to a specific checkout page/API if a paid plan is selected
+            // NOTE: Assuming your checkout route handles /billing/checkout?plan=...
+            router.push(`/billing/checkout?plan=${plan}`);
+        } else {
+            // Otherwise, redirect to the default dashboard or free sign-up success page
+            router.push('/dashboard'); 
+        }
+    };
 
     // --- HISTORY MANAGEMENT (Unchanged) ---
     
@@ -49,7 +63,7 @@ export default function EmailAuthForm() {
         window.history.pushState({ view: nextView }, '', window.location.href); 
     };
 
-    // --- API HANDLERS (Unchanged) ---
+    // --- API HANDLERS ---
     
     const handleEmailCheck = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -83,7 +97,7 @@ export default function EmailAuthForm() {
             } else {
                 transitionToView('password_register');
             }
-        } catch (_error) { // Using _error to suppress unused variable warning
+        } catch (_error) {
             const message = _error instanceof Error ? _error.message : 'A network error occurred. Please try again.';
             setError(message);
             setIsLoading(false);
@@ -106,11 +120,11 @@ export default function EmailAuthForm() {
 
             if (response.ok) {
                 login(data.user, data.token);
-                router.push('/dashboard'); 
+                redirectAfterAuth(); // USE NEW REDIRECTION LOGIC
             } else {
                 setError(data.error || 'Invalid password.');
             }
-        } catch (_error) { // Using _error to suppress unused variable warning
+        } catch (_error) { 
             setError('A network error occurred during login.');
             setIsLoading(false);
         }
@@ -132,11 +146,11 @@ export default function EmailAuthForm() {
 
             if (response.ok) {
                 login(data.user, data.token);
-                router.push('/dashboard'); 
+                redirectAfterAuth(); // USE NEW REDIRECTION LOGIC
             } else {
                 setError(data.error || 'Registration failed.');
             }
-        } catch (_error) { // Using _error to suppress unused variable warning
+        } catch (_error) { 
             setError('A network error occurred during registration.');
             setIsLoading(false);
         }
@@ -190,7 +204,6 @@ export default function EmailAuthForm() {
             </div>
             
             <CommonSSO />
-
         </form>
     );
 
@@ -263,8 +276,9 @@ export default function EmailAuthForm() {
                 {isLoading ? 'Registering...' : 'Create Account'}
             </button>
             
-            {/* Reverting to initial email view */}
             <button type="button" onClick={() => setView('email_input')} className="text-sm text-gray-500 hover:text-gray-400 underline pt-4">Start Over</button>
+
+            <CommonSSO />
 
         </form>
     );
