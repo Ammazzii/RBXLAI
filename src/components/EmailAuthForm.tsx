@@ -17,7 +17,7 @@ export default function EmailAuthForm() {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // --- API HANDLERS (Unchanged) ---
+    // --- API HANDLERS (Fixed catch blocks) ---
     
     const handleEmailCheck = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -51,8 +51,8 @@ export default function EmailAuthForm() {
             } else {
                 setView('password_register');
             }
-        } catch (error) {
-            const message = error instanceof Error ? error.message : 'A network error occurred. Please try again.';
+        } catch (_error) { // FIX: Using _error to resolve unused variable warning
+            const message = _error instanceof Error ? _error.message : 'A network error occurred. Please try again.';
             setError(message);
             setIsLoading(false);
         }
@@ -78,7 +78,7 @@ export default function EmailAuthForm() {
             } else {
                 setError(data.error || 'Invalid password.');
             }
-        } catch (error) {
+        } catch (_error) { // FIX: Using _error to resolve unused variable warning
             setError('A network error occurred during login.');
             setIsLoading(false);
         }
@@ -104,7 +104,7 @@ export default function EmailAuthForm() {
             } else {
                 setError(data.error || 'Registration failed.');
             }
-        } catch (error) {
+        } catch (_error) { // FIX: Using _error to resolve unused variable warning
             setError('A network error occurred during registration.');
             setIsLoading(false);
         }
@@ -171,7 +171,41 @@ export default function EmailAuthForm() {
     );
 
     const renderPasswordLogin = () => (
-         <form onSubmit={handleRegister} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-8">
+        <form onSubmit={handleLogin} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-8"> {/* Increased spacing */}
+            <h3 className="text-2xl font-bold text-white mb-2">Welcome Back</h3>
+            <p className="text-gray-400 text-center">Enter your password for <span className="font-semibold text-white">{email}</span></p>
+
+            {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+            
+            {/* Password Input Field - USES NEW CSS CLASS */}
+            <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="auth-input-field" /* Custom CSS for tall input */
+                required
+            />
+
+            {/* Login Button - USES NEW CSS CLASS */}
+            <button
+                type="submit"
+                disabled={isLoading}
+                className="auth-primary-button" /* Custom CSS for tall button */
+            >
+                {isLoading ? 'Logging In...' : 'Log In'}
+            </button>
+            
+            <Link href="#" className="text-sm text-blue-400 hover:underline">Forgot password?</Link>
+            <button type="button" onClick={() => { setView('email_input'); setPassword(''); }} className="text-sm text-gray-500 hover:text-gray-400 underline">Change Email</button>
+
+            <CommonSSOAndFooter isLoginView={true} />
+
+        </form>
+    );
+
+    const renderPasswordRegister = () => (
+        <form onSubmit={handleRegister} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-8"> {/* Increased spacing */}
             <h3 className="text-2xl font-bold text-white mb-2">Create Your Account</h3>
             <p className="text-gray-400 text-center">Complete your registration for <span className="font-semibold text-white">{email}</span></p>
 
@@ -201,46 +235,6 @@ export default function EmailAuthForm() {
                 type="submit"
                 disabled={isLoading}
                 className="auth-primary-button" /* Custom CSS for tall button */
-            >
-                {isLoading ? 'Registering...' : 'Create Account'}
-            </button>
-            
-            <CommonSSOAndFooter isLoginView={false} />
-
-        </form>
-    );
-
-    const renderPasswordRegister = () => (
-        <form onSubmit={handleRegister} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-6">
-            <h3 className="text-2xl font-bold text-white mb-2">Create Your Account</h3>
-            <p className="text-gray-400 text-center">Complete your registration for <span className="font-semibold text-white">{email}</span></p>
-
-            {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
-
-            {/* Name Input Field - USES NEW CSS CLASS */}
-            <input
-                type="text"
-                placeholder="Full Name (Optional)"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="auth-input-field" /* Custom CSS for tall input */
-            />
-            
-            {/* Password Input Field - USES NEW CSS CLASS */}
-            <input
-                type="password"
-                placeholder="Choose a Password (min 8 characters)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="auth-input-field" /* Custom CSS for tall input */
-                required
-            />
-
-            {/* Register Button - USES NEW CSS CLASS */}
-            <button
-                type="submit"
-                disabled={isLoading}
-                className="auth-primary-button mt-4" /* Custom CSS for tall button */
             >
                 {isLoading ? 'Registering...' : 'Create Account'}
             </button>
