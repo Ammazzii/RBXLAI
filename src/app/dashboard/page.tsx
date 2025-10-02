@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import BillingModal from '@/components/BillingModal';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'; // ADD THIS LINE
 
 // --- ROBLOX-STYLE ICONS ---
 const ArrowIcon = ({ isOpen }: { isOpen: boolean }) => (
@@ -744,7 +745,7 @@ export default function HomePage() {
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showBillingModal, setShowBillingModal] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([{ role: 'assistant', content: 'Welcome to RBXAI! How can I help you build your Roblox game today?' }]);
+  const [messages, setMessages] = useState<Message[]>([{ role: 'assistant', content: 'Welcome to RBXLAI! How can I help you build your Roblox game today?' }]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
@@ -1431,7 +1432,9 @@ ${conversationalReply}`;
         // --- If the user IS logged in, render your FULL original UI ---
         <main className="flex h-screen flex-col text-white">
           <header className="flex h-14 w-full flex-shrink-0 items-center justify-between border-b border-gray-700 bg-gray-800 px-4">
-            <h1 className="text-xl font-bold">RBXAI</h1>
+            <Link href="/" passHref className="text-xl font-bold hover:text-blue-400 transition">
+              RBXLAI
+            </Link>
             <div className="flex items-center space-x-6">
               {user && (
                 <div className="flex items-center space-x-4">

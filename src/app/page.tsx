@@ -10,7 +10,7 @@ export default function LandingPage() {
                 <div className="animated-gradient-background"></div>
                 <header className="animate">
                     <nav>
-                        <Link href="/" className="logo">RBXLabs</Link>
+                        <Link href="/" className="logo">RBXLAI</Link>
                         <ul>
                             <li><a href="#features">Features</a></li>
                             <li><a href="#pricing">Pricing</a></li>
