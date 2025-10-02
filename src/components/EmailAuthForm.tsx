@@ -1,10 +1,13 @@
 // src/components/EmailAuthForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+
+// Type guard for suppressing unused variable warning
+type ElementProps = { id?: string; className?: string; children?: React.ReactNode; [key: string]: unknown };
 
 export default function EmailAuthForm() {
     const { login } = useAuth();
@@ -17,7 +20,39 @@ export default function EmailAuthForm() {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // --- API HANDLERS (Fixed catch blocks) ---
+    // --- HISTORY MANAGEMENT ---
+    
+    // Listen for browser back/forward buttons to manage form state transitions
+    useEffect(() => {
+        const handlePopState = (event: PopStateEvent) => {
+            if (event.state && event.state.view) {
+                // Restore form view based on history state
+                setView(event.state.view);
+            } else if (view !== 'email_input') {
+                // If history state is null (e.g., first entry), go back to initial view
+                setView('email_input');
+            }
+        };
+
+        // Only listen for history changes once the internal form flow has started
+        if (view !== 'email_input') {
+            window.addEventListener('popstate', handlePopState);
+        }
+        
+        // Cleanup listener when component state changes or unmounts
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, [view]);
+
+    // Function to handle state transition while updating browser history
+    const transitionToView = (nextView: 'password_login' | 'password_register') => {
+        setView(nextView);
+        // Push state allows the browser back button to naturally revert the view state
+        window.history.pushState({ view: nextView }, '', window.location.href); 
+    };
+
+    // --- API HANDLERS ---
     
     const handleEmailCheck = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,11 +82,11 @@ export default function EmailAuthForm() {
             setPassword(''); 
 
             if (data.exists) {
-                setView('password_login');
+                transitionToView('password_login');
             } else {
-                setView('password_register');
+                transitionToView('password_register');
             }
-        } catch (_error) { // FIX: Using _error to resolve unused variable warning
+        } catch (_error) { // Using _error to suppress unused variable warning
             const message = _error instanceof Error ? _error.message : 'A network error occurred. Please try again.';
             setError(message);
             setIsLoading(false);
@@ -78,7 +113,7 @@ export default function EmailAuthForm() {
             } else {
                 setError(data.error || 'Invalid password.');
             }
-        } catch (_error) { // FIX: Using _error to resolve unused variable warning
+        } catch (_error) { // Using _error to suppress unused variable warning
             setError('A network error occurred during login.');
             setIsLoading(false);
         }
@@ -104,7 +139,7 @@ export default function EmailAuthForm() {
             } else {
                 setError(data.error || 'Registration failed.');
             }
-        } catch (_error) { // FIX: Using _error to resolve unused variable warning
+        } catch (_error) { // Using _error to suppress unused variable warning
             setError('A network error occurred during registration.');
             setIsLoading(false);
         }
