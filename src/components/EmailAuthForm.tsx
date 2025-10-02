@@ -6,9 +6,6 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
-// Type guard for suppressing unused variable warning
-type ElementProps = { id?: string; className?: string; children?: React.ReactNode; [key: string]: unknown };
-
 export default function EmailAuthForm() {
     const { login } = useAuth();
     const router = useRouter();
@@ -20,7 +17,7 @@ export default function EmailAuthForm() {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // --- HISTORY MANAGEMENT ---
+    // --- HISTORY MANAGEMENT (Unchanged) ---
     
     // Listen for browser back/forward buttons to manage form state transitions
     useEffect(() => {
@@ -52,7 +49,7 @@ export default function EmailAuthForm() {
         window.history.pushState({ view: nextView }, '', window.location.href); 
     };
 
-    // --- API HANDLERS ---
+    // --- API HANDLERS (Unchanged) ---
     
     const handleEmailCheck = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -148,7 +145,7 @@ export default function EmailAuthForm() {
 
     // --- COMMON RENDER BLOCKS ---
 
-    const CommonSSOAndFooter = ({ isLoginView = true }: { isLoginView?: boolean }) => (
+    const CommonSSO = () => (
         <>
             {/* OR Separator (Uses Custom CSS Class for spacing) */}
             <div className="form-divider w-full">
@@ -163,15 +160,6 @@ export default function EmailAuthForm() {
                 <svg width="24" height="24" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                 <span>Continue with Google</span>
             </Link>
-
-            {/* Register text / Already have an account text */}
-            <p className="text-center text-sm text-gray-500 pt-6">
-                {isLoginView ? 
-                    (<>Don&apos;t have an account? <span className="text-blue-400 hover:underline">Register</span></>) 
-                    : 
-                    (<>Already a user? <button type="button" onClick={() => setView('email_input')} className="text-blue-400 hover:underline">Sign In</button></>)
-                }
-            </p>
         </>
     );
 
@@ -201,12 +189,13 @@ export default function EmailAuthForm() {
                 </button>
             </div>
             
-            <CommonSSOAndFooter isLoginView={true} />
+            <CommonSSO />
+
         </form>
     );
 
     const renderPasswordLogin = () => (
-        <form onSubmit={handleLogin} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-8"> {/* Increased spacing */}
+        <form onSubmit={handleLogin} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-8"> 
             <h3 className="text-2xl font-bold text-white mb-2">Welcome Back</h3>
             <p className="text-gray-400 text-center">Enter your password for <span className="font-semibold text-white">{email}</span></p>
 
@@ -234,13 +223,13 @@ export default function EmailAuthForm() {
             <Link href="#" className="text-sm text-blue-400 hover:underline">Forgot password?</Link>
             <button type="button" onClick={() => { setView('email_input'); setPassword(''); }} className="text-sm text-gray-500 hover:text-gray-400 underline">Change Email</button>
 
-            <CommonSSOAndFooter isLoginView={true} />
+            <CommonSSO />
 
         </form>
     );
 
     const renderPasswordRegister = () => (
-        <form onSubmit={handleRegister} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-8"> {/* Increased spacing */}
+        <form onSubmit={handleRegister} className="auth-form-wrapper flex flex-col items-center mx-auto space-y-8"> 
             <h3 className="text-2xl font-bold text-white mb-2">Create Your Account</h3>
             <p className="text-gray-400 text-center">Complete your registration for <span className="font-semibold text-white">{email}</span></p>
 
@@ -274,7 +263,8 @@ export default function EmailAuthForm() {
                 {isLoading ? 'Registering...' : 'Create Account'}
             </button>
             
-            <CommonSSOAndFooter isLoginView={false} />
+            {/* Reverting to initial email view */}
+            <button type="button" onClick={() => setView('email_input')} className="text-sm text-gray-500 hover:text-gray-400 underline pt-4">Start Over</button>
 
         </form>
     );
