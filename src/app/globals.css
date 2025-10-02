@@ -317,3 +317,31 @@ footer { padding: 40px 20px; text-align: center; font-size: 0.9rem; color: var(-
     padding: 15px 45px !important; 
     height: auto;
 }
+
+/* Base style for inputs in login/register views */
+.auth-input-field {
+    width: 100%;
+    padding: 16px 20px !important; /* TALL padding for consistency */
+    font-size: 1.1rem !important;
+    background-color: var(--background-dark) !important;
+    border: 1px solid var(--border-dark) !important;
+    border-radius: 12px !important;
+    color: var(--text-light) !important;
+    transition: all 0.2s ease;
+}
+
+/* Base style for buttons in login/register views */
+.auth-primary-button {
+    width: 100%;
+    padding: 16px 20px !important; /* TALL padding for consistency */
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.auth-primary-button:hover {
+    background-color: #1e52cf; /* Slightly darker hover blue */
+}
