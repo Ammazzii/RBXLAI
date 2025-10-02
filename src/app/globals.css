@@ -247,3 +247,73 @@ footer { padding: 40px 20px; text-align: center; font-size: 0.9rem; color: var(-
 .animate-scale-up {
   animation: scale-up 0.2s ease-out;
 }
+
+/* --- Custom Landing Page Form Styles --- */
+
+.auth-form-wrapper {
+    /* Controls overall horizontal width (HORIZONTALLY SHORT) */
+    width: 100%;
+    max-width: 900px; /* Enforcing a NARROWER form size */
+    margin-left: auto; /* Ensure centering */
+    margin-right: auto; /* Ensure centering */
+}
+
+.signup-form-group {
+    /* Mimics the .signup-form structure for the combined input/button */
+    display: flex;
+    border: 1px solid var(--border-dark); 
+    border-radius: 12px;
+    background-color: var(--background-dark);
+    /* Replicating complex shadow from original CSS for premium look */
+    box-shadow: 
+        0 1px 2px rgba(0,0,0,0.1), 
+        0 5px 15px rgba(0,0,0,0.1), 
+        0 0 0 1px #30363d, 
+        0 0 40px rgba(37, 99, 235, 0.2); 
+}
+
+.form-input-field {
+    /* Specific input styling */
+    flex-grow: 1; 
+    border: none !important; 
+    outline: none !important; 
+    background: transparent !important; 
+    padding: 15px 45px !important; /* VERTICALLY LONG: Extreme vertical padding */
+    font-size: 1.1rem !important; 
+    color: var(--text-light) !important; 
+    border-radius: 12px 0 0 12px !important;
+}
+
+.form-continue-button {
+    /* Specific button styling */
+    border-radius: 0 10px 10px 0 !important; 
+    padding: 15px 15px !important; /* MATCHING VERTICALLY LONG PADDING */
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+}
+
+.form-divider {
+    /* Mimics the original .divider structure for perfect spacing */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--text-secondary-light);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 1.5rem 0; /* Generous vertical margin */
+}
+.form-divider::before, .form-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-dark);
+}
+.form-divider span {
+    padding: 0 10px;
+}
+
+/* Custom class for Google button to match input height precisely */
+.google-button-match {
+    /* MATCHING VERTICALLY LONG PADDING */
+    padding: 15px 45px !important; 
+    height: auto;
+}

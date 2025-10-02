@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import LandingPageClient from './LandingPageClient'; 
+import EmailAuthForm from '@/components/EmailAuthForm'; // NEW IMPORT
 
 export default function LandingPage() {
     return (
@@ -13,7 +14,7 @@ export default function LandingPage() {
                         <li><a href="#pricing">Pricing</a></li>
                         <li><a href="#faq">FAQ</a></li>
                     </ul>
-                    <Link href="/dashboard" className="cta-button">Get Started</Link>
+                    <Link href="/?auth=true" className="cta-button">Get Started</Link>
                 </nav>
             </header>
             <main>
@@ -191,12 +192,13 @@ export default function LandingPage() {
                         </details>
                     </div>
                 </section>
-               <section id="cta" className="animate">
-    <h2>Ready to Start Building?</h2>
-    <Link href="/dashboard" className="cta-button large px-8 py-4 text-lg">
-        Get Started For Free
-    </Link>
-</section>
+              <section id="cta" className="animate">
+                    <h2>Ready to Start Building?</h2>
+                    {/* New Behavior: Redirects to homepage with parameter */}
+                    <Link href="/?auth=true" className="cta-button large px-8 py-4 text-lg">
+                        Get Started For Free
+                    </Link>
+                </section>
             </main>
             <footer>
                 <p>&copy; 2025 RBXLabs. All Rights Reserved.</p>
