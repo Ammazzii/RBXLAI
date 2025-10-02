@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import LandingPageClient from './LandingPageClient'; 
-import EmailAuthForm from '@/components/EmailAuthForm'; // NEW IMPORT
 
 export default function LandingPage() {
     return (

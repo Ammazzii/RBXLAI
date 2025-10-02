@@ -51,8 +51,8 @@ export default function EmailAuthForm() {
             } else {
                 setView('password_register');
             }
-        } catch (err) {
-            const message = err instanceof Error ? err.message : 'A network error occurred. Please try again.';
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'A network error occurred. Please try again.';
             setError(message);
             setIsLoading(false);
         }

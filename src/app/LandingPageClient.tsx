@@ -2,22 +2,26 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation'; // NEW IMPORT
-import EmailAuthForm from '@/components/EmailAuthForm';
+import { useSearchParams } from 'next/navigation'; 
+import EmailAuthForm from '@/components/EmailAuthForm'; 
 
 // The words used in the original typewriter script
 const words = ["scripts.", "datastore systems.", "admin panels.", "UI animations."];
+
+// Helper type for elements we know will have children (since they represent the JSX structure)
+type ElementWithChildren = React.ReactElement<{ children: React.ReactNode; [key: string]: any }>;
 
 interface LandingPageClientProps {
     children: React.ReactNode;
 }
 
+// Type guard for safe element access (Fixes the heroChild.props errors)
+const isChildElement = (child: React.ReactNode): child is ElementWithChildren => {
+    return React.isValidElement(child);
+};
+
 /**
- * Handles all client-side logic for the landing page:
- * 1. Typewriter effect for the hero text.
- * 2. Scroll-reveal animations for elements with the 'animate' class.
- * 3. Manages the display state of the Hero CTA (Button vs. Auth Form).
- * 4. Checks for URL parameter (?auth=true) to auto-open the form.
+ * Handles all client-side logic for the landing page.
  */
 export default function LandingPageClient({ children }: LandingPageClientProps) {
     const [wordIndex, setWordIndex] = useState(0);
@@ -26,15 +30,14 @@ export default function LandingPageClient({ children }: LandingPageClientProps) 
     const [displayText, setDisplayText] = useState('');
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // NEW STATE: Controls whether the form or the button is shown
+    // Controls whether the form or the button is shown
     const [showAuthForm, setShowAuthForm] = useState(false);
     
-    // NEW HOOK: Get URL parameters
+    // Get URL parameters
     const searchParams = useSearchParams();
 
-    // --- Typewriter Effect Logic (UNMODIFIED) ---
+    // --- Typewriter Effect Logic ---
     useEffect(() => {
-        // Clear any previous timeout before setting a new one
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
@@ -44,30 +47,23 @@ export default function LandingPageClient({ children }: LandingPageClientProps) 
 
         const handleTyping = () => {
             if (isDeleting) {
-                // Deleting
                 setDisplayText(currentWord.substring(0, charIndex - 1));
                 setCharIndex(prev => prev - 1);
             } else {
-                // Typing
                 setDisplayText(currentWord.substring(0, charIndex + 1));
                 setCharIndex(prev => prev + 1);
             }
         };
 
-        // Determine next action
         if (!isDeleting && charIndex === currentWord.length) {
-            // Finished typing word: Pause for 1.5s, then start deleting
             timeoutRef.current = setTimeout(() => setIsDeleting(true), 1500);
         } else if (isDeleting && charIndex === 0) {
-            // Finished deleting word: Move to next word and start typing
             setIsDeleting(false);
             setWordIndex((prevIndex) => (prevIndex + 1) % words.length);
         } else {
-            // Continue typing or deleting
             timeoutRef.current = setTimeout(handleTyping, typingSpeed);
         }
 
-        // Cleanup function for the effect
         return () => {
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
@@ -75,7 +71,7 @@ export default function LandingPageClient({ children }: LandingPageClientProps) 
         };
     }, [charIndex, isDeleting, wordIndex]);
 
-    // --- Scroll Animation Logic (UNMODIFIED) ---
+    // --- Scroll Animation Logic ---
     useEffect(() => {
         const animatedElements = document.querySelectorAll(".animate");
         
@@ -89,13 +85,11 @@ export default function LandingPageClient({ children }: LandingPageClientProps) 
 
         animatedElements.forEach(element => { observer.observe(element); });
 
-        // Cleanup observer on unmount
         return () => {
             animatedElements.forEach(element => { observer.unobserve(element); });
         };
     }, []);
 
-    // Inject the dynamically generated text into the specific span with id="typewriter" (UNMODIFIED)
     useEffect(() => {
         const typewriterElement = document.getElementById('typewriter');
         if (typewriterElement) {
@@ -104,31 +98,37 @@ export default function LandingPageClient({ children }: LandingPageClientProps) 
     }, [displayText]);
 
 
-    // --- NEW LOGIC: Check URL for ?auth=true on mount ---
+    // --- LOGIC: Check URL for ?auth=true on mount ---
     useEffect(() => {
         if (searchParams.get('auth') === 'true') {
             setShowAuthForm(true);
-            // Clean the URL history state so the user isn't stuck reloading the form
             window.history.replaceState(null, '', window.location.pathname);
         }
-    }, [searchParams]); // Reruns if URL parameters change
+    }, [searchParams]);
 
-    // Function to clone and modify the children
+    // Function to clone and modify the children (MAXIMUM TYPE SAFETY)
     const renderContent = () => {
-        // We find the hero CTA section to replace it
-        // Note: This relies on the specific structure in src/app/page.tsx
-        return React.Children.map(children, (child: any) => {
-            if (child.type === 'main') {
-                return React.cloneElement(child, {
-                    children: React.Children.map(child.props.children, (mainChild: any) => {
-                        if (mainChild.props && mainChild.props.id === 'hero') {
-                            // Found the Hero section, now look for the CTA div
-                            return React.cloneElement(mainChild, {
-                                children: React.Children.map(mainChild.props.children, (heroChild: any) => {
-                                    // Check for the div containing the original CTA button. 
-                                    // We identify it by looking for the specific className used in page.tsx
-                                    if (heroChild.props && heroChild.props.className?.includes('mt-8 animate')) {
-                                        return React.cloneElement(heroChild, {
+        return React.Children.map(children, (child) => {
+            // Level 1: Find the <main> tag
+            if (isChildElement(child) && child.type === 'main') {
+                const mainChild = child;
+                
+                return React.cloneElement(mainChild, {
+                    children: React.Children.map(mainChild.props.children, (heroChild) => {
+                        if (!isChildElement(heroChild)) return heroChild;
+
+                        // Level 2: Find the Hero section
+                        if (heroChild.props?.id === 'hero') {
+                            const heroElement = heroChild;
+
+                            return React.cloneElement(heroElement, {
+                                children: React.Children.map(heroElement.props.children, (ctaContainer) => {
+                                    if (!isChildElement(ctaContainer)) return ctaContainer;
+                                    
+                                    // Level 3: Find the CTA container (div with class mt-8 animate)
+                                    if (ctaContainer.props.className?.includes('mt-8 animate')) {
+                                        
+                                        return React.cloneElement(ctaContainer, {
                                             children: showAuthForm ? (
                                                 <EmailAuthForm />
                                             ) : (
@@ -142,11 +142,11 @@ export default function LandingPageClient({ children }: LandingPageClientProps) 
                                             )
                                         });
                                     }
-                                    return heroChild;
+                                    return ctaContainer;
                                 })
                             });
                         }
-                        return mainChild;
+                        return heroChild;
                     })
                 });
             }
